@@ -54,13 +54,14 @@
             100% { transform: scale(1); }
         }
 
-        @media (max-width: 768px) {
-  .navbar-collapse {
-    background: #343a40;
-    padding: 15px;
-    margin-top: 10px;
-  }
-}
+      @media (max-width: 768px) {
+      .navbar-collapse.show {
+        background: #343a40;
+        padding: 15px;
+        margin-top: 10px;
+      }
+    }
+
     </style>
 </head>
 <body>
@@ -184,23 +185,16 @@
 
     <!-- Animation Trigger Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const animateElements = document.querySelectorAll('.animate__animated');
+        document.addEventListener("DOMContentLoaded", function () {
+            const navLinks = document.querySelectorAll(".nav-link");
+            const navCollapse = document.querySelector(".navbar-collapse");
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.visibility = 'visible';
-                        entry.target.classList.add(entry.target.dataset.animation);
+            navLinks.forEach(link => {
+                link.addEventListener("click", function () {
+                    if (navCollapse.classList.contains("show")) {
+                        new bootstrap.Collapse(navCollapse).hide();
                     }
                 });
-            }, {
-                threshold: 0.1
-            });
-
-            animateElements.forEach(element => {
-                element.style.visibility = 'hidden';
-                observer.observe(element);
             });
         });
     </script>
