@@ -6,10 +6,10 @@ function deleteProduct(productId) {
                 'Content-Type': 'application/json',
             },
         })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to delete');
             window.location.reload();
-        });
+        })
+        .catch(error => alert(error.message));
     }
 }

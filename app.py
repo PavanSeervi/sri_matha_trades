@@ -24,7 +24,7 @@ def load_user(user_id):
 
 
 # Dummy user data (replace with a database in production)
-users = {'admin': {'password': 'admin123'}}
+users_db = {'admin': {'password': 'admin123'}}
 
 
 # Homepage
@@ -41,7 +41,7 @@ def login():
         password = request.form['password']
 
         # Check if the user exists and the password is correct
-        if username in users and users[username]['password'] == password:
+        if username in users_db and users_db[username]['password'] == password:
             user = User(username)
             login_user(user)
             return redirect(url_for('admin'))
@@ -68,20 +68,33 @@ def admin():
         price = float(request.form['price'])
         stock = int(request.form['stock'])
 
-        conn = sqlite3.connect('database.db')
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO products (name, price, stock) VALUES (?, ?, ?)", (name, price, stock))
+            conn.commit()
+
+        return redirect(url_for('admin'))
+
+    with sqlite3.connect('database.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM products ORDER BY id DESC LIMIT 10")  # Fetch recent 10 products
+        products = cursor.fetchall()
+
+    return render_template('admin.html', products=products)
+
+@app.route('/add_product', methods=['POST'])
+@login_required
+def add_product():
+    name = request.form['name']
+    price = float(request.form['price'])
+    stock = int(request.form['stock'])
+
+    with sqlite3.connect('database.db') as conn:
         cursor = conn.cursor()
         cursor.execute("INSERT INTO products (name, price, stock) VALUES (?, ?, ?)", (name, price, stock))
         conn.commit()
-        conn.close()
-        return redirect(url_for('admin'))
 
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    # Fetch the 10 most recent products (ordered by ID in descending order)
-    cursor.execute("SELECT * FROM products ORDER BY id DESC LIMIT 10")
-    products = cursor.fetchall()
-    conn.close()
-    return render_template('admin.html', products=products)
+    return redirect(url_for('admin'))
 
 
 # Product Catalog
@@ -89,9 +102,6 @@ def admin():
 def products():
     search_query = request.args.get('search', '')
     sort_by = request.args.get('sort', '')
-
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
 
     query = "SELECT * FROM products WHERE name LIKE ?"
     params = [f'%{search_query}%']
@@ -103,9 +113,11 @@ def products():
     elif sort_by == 'stock_asc':
         query += " ORDER BY stock ASC"
 
-    cursor.execute(query, params)
-    products = cursor.fetchall()
-    conn.close()
+    with sqlite3.connect('database.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        products = cursor.fetchall()
+
     return render_template('products.html', products=products)
 
 
@@ -118,33 +130,34 @@ def edit_product(product_id):
         price = float(request.form['price'])
         stock = int(request.form['stock'])
 
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        cursor.execute("UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?",
-                       (name, price, stock, product_id))
-        conn.commit()
-        conn.close()
+        with sqlite3.connect('database.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?",
+                           (name, price, stock, product_id))
+            conn.commit()
+
         return redirect(url_for('admin'))
 
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM products WHERE id = ?", (product_id,))
-    product = cursor.fetchone()
-    conn.close()
+    with sqlite3.connect('database.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM products WHERE id = ?", (product_id,))
+        product = cursor.fetchone()
+
     return render_template('edit_product.html', product=product)
 
 
-# Delete Product
-@app.route('/delete_product/<int:product_id>', methods=['POST'])
-@login_required
+# Delete Product - Fixed to handle DELETE requests properly
+@app.route('/delete/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Product deleted successfully!'})
-
+    try:
+        conn = sqlite3.connect('database.db')  # Update your database connection
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Product deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)  # Debug mode enabled for development

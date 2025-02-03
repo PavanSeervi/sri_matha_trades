@@ -53,33 +53,32 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+
+        @media (max-width: 768px) {
+  .navbar-collapse {
+    background: #343a40;
+    padding: 15px;
+    margin-top: 10px;
+  }
+}
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand animate__animated animate__fadeInLeft" href="#">
-                <i class="bi bi-shop-window me-2"></i>Sri Matha Trades
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto animate__animated animate__fadeInRight">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">Admin</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <div class="container">
+    <a class="navbar-brand" href="/">Sri Matha Trades</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
     <!-- Hero Section -->
     <section class="hero-section text-white py-5 vh-100 d-flex align-items-center">
@@ -159,12 +158,12 @@
             <div class="row g-4">
                 <div class="col-md-4 animate__animated animate__fadeInUp">
                     <h4 class="mb-4"><i class="bi bi-geo-alt me-2"></i>Location</h4>
-                    <p>123 Trade Street<br>Business City, BC 456789</p>
+                    <p>Old Alwal, Ambedkar Nagar <br>Hyderabad City, 500010</p>
                 </div>
 
                 <div class="col-md-4 animate__animated animate__fadeInUp animate-delay-1">
                     <h4 class="mb-4"><i class="bi bi-telephone me-2"></i>Contact</h4>
-                    <p>Email: info@srimathatrades.com<br>Phone: +91 98765 43210</p>
+                    <p>Email: info@srimathatrades.com<br>Phone: +91 98** ******</p>
                 </div>
 
                 <div class="col-md-4 animate__animated animate__fadeInUp animate-delay-2">
